@@ -1,0 +1,12 @@
+# docker-compose.yml 수정
+services:
+  sweetspot-admin:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: sweetspot-admin
+    ports:
+      - "5002:5002"
+    env_file:
+      - .env
+    restart: always
