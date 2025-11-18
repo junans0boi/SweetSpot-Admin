@@ -1,12 +1,45 @@
-# docker-compose.yml 수정
+# docker-compose.yml
+
 services:
-  sweetspot-admin:
+  sweetspot-admin-backend: # (이름을 backend로 명확히 변경)
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: sweetspot-admin
+    container_name: sweetspot-admin-backend
     ports:
-      - "5002:5002"
+      - "5007:5007" # ◀️ 관리자 백엔드 포트
     env_file:
       - .env
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    volumes:
+      # 호스트의 CSV 폴더를 컨테이너 내부의 동일한 경로로 마운트합니다.
+      - /home/ubuntu/Project/SweetSpot-Admin/csv-data:/home/ubuntu/Project/SweetSpot-Admin/csv-data
+      - /home/ubuntu/Project/SweetSpot-Admin/output:/home/ubuntu/Project/SweetSpot-Admin/output
+      - /home/ubuntu/Project/SweetSpot-Admin/logs:/home/ubuntu/Project/SweetSpot-Admin/logs
+    restart: always
+
+  sweetspot-admin-frontend: # ✅ [신규] 관리자 프론트엔드 서비스
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: sweetspot-admin-frontend
+    ports:
+      - "5008:5008"
+      
+    # ✅ [추가] 컨테이너 환경을 development로 설정
+    environment:
+      - NODE_ENV=development
+      
+    volumes:
+      # [기존]
+      - ./frontend/src:/app/src
+      - ./frontend/vite.config.js:/app/vite.config.js
+      - ./frontend/index.html:/app/index.html
+      
+      # ✅ [추가] Tailwind 설정 파일들도 핫 리로딩을 위해 마운트
+      - ./frontend/tailwind.config.js:/app/tailwind.config.js
+      - ./frontend/postcss.config.js:/app/postcss.config.js
+    
+
     restart: always

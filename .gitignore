@@ -24,3 +24,10 @@ hs_err_pid*
 replay_pid*
 
 .env
+
+# Data (절대 커밋하면 안 됨)
+csv-data/
+output/
+
+Scripts (만약 로컬 전용 스크립트라면)
+scripts/

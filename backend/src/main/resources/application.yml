@@ -1,15 +1,52 @@
+# application.yml
+csv:
+  directory-path: /home/ubuntu/Project/SweetSpot-Admin/csv-data
+  
 server:
-  port: ${SERVER_PORT:5002}
+  port: ${SERVER_PORT:5007}
+  connection-timeout: 1800s
 
+# ✅ [추가] .env 파일을 읽어오도록 설정 (docker-compose와 동일하게)
 spring:
-  datasource:
-    url: jdbc:mariadb://${DB_HOST}:${DB_PORT}/${DB_NAME}
+  config:
+    import: optional:file:../.env[.properties]
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 2GB
+      max-request-size: 2GB
+datasources:
+  auth:
+    url: jdbc:mariadb://${DB_HOST:localhost}:${DB_port:3306}/${DB_NAME:sweetspot_auth}
     driver-class-name: org.mariadb.jdbc.Driver
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
-  jpa:
-    hibernate:
-      ddl-auto: none
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MariaDBDialect
+    username: ${DB_USER:root}
+    password: ${DB_PASSWORD:password}
+    jpa:
+      properties:
+        hibernate:
+          dialect: org.hibernate.dialect.MariaDBDialect
+      # ddl-auto: none (auth DB는 스키마 변경 안 함)
+
+  # ✅ [추가] 'domain' (PostgreSQL) 설정
+  domain:
+    url: jdbc:postgresql://${DOMAIN_DB_HOST:localhost}:${DOMAIN_DB_PORT:5432}/${DOMAIN_DB_NAME:sweetspot_places}
+    driver-class-name: org.postgresql.Driver
+    username: ${DOMAIN_DB_USER:postgres}
+    password: ${DOMAIN_DB_PASSWORD:password}
+    jpa:
+      properties:
+        hibernate:
+          dialect: org.hibernate.dialect.PostgreSQLDialect
+          hbm2ddl:
+              auto: update 
+# ✅ [추가] JWT 설정 추가
+jwt:
+  secret: ${JWT_SECRET}
+
+vworld:
+  api:
+    key: ${VWORLD_KEY}
+    url: ${VWORLD_URL:https://api.vworld.kr/req/address}
+
+project:
+  root-path: /home/ubuntu/Project/SweetSpot-Admin
